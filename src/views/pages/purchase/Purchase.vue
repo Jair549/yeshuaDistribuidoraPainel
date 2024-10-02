@@ -82,6 +82,12 @@ const paymentMethod = [
     }
 ]
 
+const paymentTranslateMethod = {
+    pix: 'Pix',
+    card: 'Cartão',
+    money: 'Dinheiro'
+}
+
 const handleModalTitle = () => {
     return form.value.id ? 'Editar Compra' : 'Adicionar Compra';
 }
@@ -114,16 +120,36 @@ const purchasesData = ref<Purchase[]>([]);
 onMounted(async () => {
     isLoading.value = true
     await loadPurchase();
+    isLoading.value = false;
     await loadSuppliers()
     await loadProduct();
-    isLoading.value = false
 })
 
 const loadPurchase = async () => {
     await purchaseStore.index(params.value);
     purchases.value = purchaseStore.getPurchases;
     purchasesData.value = purchases.value.data;
+    prepareDataToTable();
 }
+
+const prepareDataToTable = () => {
+    purchasesData.value = purchases.value.data.map((purchase) => {
+        return {
+            id: purchase.id,
+            Produto: purchase.product.name,
+            Marca: purchase.supplier.name,
+            Quantidade: purchase.quantity,
+            'Preço Único': purchase.unit_price,
+            'Preço Total': purchase.total_price,
+            'Data de Vencimento': purchase.due_date,
+            'Data de Pagamento': purchase.payment_date,
+            'Metodo de Pagamento': paymentTranslateMethod[purchase.payment_method],
+            Status: purchase.status == 'paid' ? 'Pago' : 'Pendente',
+        }
+    })
+}
+
+const getItemById = (id: number) => purchases.value.data.find((item) => item.id === id);
 
 const loadSuppliers = async () => {
     await supplierStore.index({ without_pagination: 1 });
@@ -162,7 +188,9 @@ const actions: Action[] = [
         name: 'edit',
         hasPermission: hasPermissionTo('Update purchase'),
         action: (item) => {
-            form.value = formData(item);
+            currentItem.value = getItemById(item.id)
+
+            form.value = currentItem.value;
             showModal.value = true;
         },
         icon: 'edit',
