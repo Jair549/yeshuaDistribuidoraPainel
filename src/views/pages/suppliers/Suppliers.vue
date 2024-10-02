@@ -173,19 +173,27 @@ const clearForm = () => {
 
     <ModalComponent :show="showModal" :titleHeader="handleModalTitle()" @closeModal="handleCloseModal" @submit="handleSubmit()">
         <FormGroupComponent>
-            <InputComponent v-model="form.name" placeholder="Nome" type="text" />
+            <div class="row">
+                <div class="col-md-6">
+                    <InputComponent v-model="form.name" placeholder="Nome" type="text" />
+                </div>
+                <div class="col-md-6">
+                    <InputComponent v-model="form.email" placeholder="Email" type="text" />
+                </div>
+            </div>
+        </FormGroupComponent>
+        <FormGroupComponent>
+            <div class="row">
+                <div class="col-md-6">
+                    <InputComponent v-model="form.phone" v-maska="'(##) 9 ####-####'" placeholder="phone" type="text" />
+                </div>
+                <div class="col-md-6">
+                    <InputComponent v-model="form.last_purchase" placeholder="Última Compra" type="date" />
+                </div>
+            </div>
         </FormGroupComponent>
         <FormGroupComponent>
             <InputComponent v-model="form.address" placeholder="Endereço" type="text" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <InputComponent v-model="form.phone" v-maska="'(##) 9 ####-####'" placeholder="phone" type="text" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <InputComponent v-model="form.email" placeholder="Email" type="text" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <InputComponent v-model="form.last_purchase" placeholder="Última Compra" type="date" />
         </FormGroupComponent>
         <FormGroupComponent>
             <InputComponent v-model="form.description" placeholder="Descrição" type="text" />

@@ -219,22 +219,34 @@ const clearForm = () => {
 
     <ModalComponent :show="showModal" @closeModal="handleCloseModal" :titleHeader="handleModalTitle()" @submit="handleSubmit">
         <FormGroupComponent>
-            <InputComponent v-model="form.name" placeholder="Nome" type="text" />
+            <div class="row">
+                <div class="col-md-6">
+                    <InputComponent v-model="form.name" placeholder="Nome" type="text" />
+                </div>
+                <div class="col-md-6">
+                    <InputComponent v-model="form.email" placeholder="Email" type="email" />
+                </div>
+            </div>
         </FormGroupComponent>
         <FormGroupComponent>
-            <InputComponent v-model="form.email" placeholder="Email" type="email" />
+            <div class="row">
+                <div class="col-md-6">
+                    <InputComponent v-model="form.phone" v-maska="'(##) 9 ####-####'" placeholder="Telefone" type="text" />
+                </div>
+                <div class="col-md-6">
+                    <InputComponent v-model="form.address" placeholder="Endereço" type="text" />
+                </div>
+            </div>
         </FormGroupComponent>
         <FormGroupComponent>
-            <InputComponent v-model="form.phone" v-maska="'(##) 9 ####-####'" placeholder="Telefone" type="text" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <InputComponent v-model="form.address" placeholder="Endereço" type="text" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <InputComponent v-model="form.last_purchase" placeholder="Última compra" type="date" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <SelectComponent v-model="form.type" :options="typeUser" placeholder="Tipo de cliente" />
+            <div class="row">
+                <div class="col-md-6">
+                    <InputComponent v-model="form.last_purchase" placeholder="Última compra" type="date" />
+                </div>
+                <div class="col-md-6">
+                    <SelectComponent v-model="form.type" :options="typeUser" placeholder="Tipo de cliente" />
+                </div>
+            </div>
         </FormGroupComponent>
     </ModalComponent>
 

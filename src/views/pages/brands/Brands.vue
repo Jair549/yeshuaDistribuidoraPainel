@@ -14,11 +14,11 @@ import {
     SearchComponent,
     TableComponent,
     LoadingComponent,
-    PaginationComponent
+    PaginationComponent,
+    ConfirmDeleteModalComponent
 } from '@/utils/components';
 import type { Action } from '@/interfaces/actions.interface';
 import { Brand } from '@/interfaces/brand.interface';
-import ConfirmDeleteModalComponent from '@/components/ConfirmDeleteModalComponent.vue';
 import { useAcl } from '@/utils/acl';
 
 const brandStore = useBrandStore();
