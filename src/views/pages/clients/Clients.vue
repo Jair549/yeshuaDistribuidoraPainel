@@ -73,7 +73,7 @@ const formData = (data: any = {}) => {
     }
 }
 
-const clientsData = ref<Client[]>([]);
+const clientsData = ref([]);
 const form = ref(formData());
 
 onMounted(async () => {
@@ -86,7 +86,26 @@ const loadClients = async () => {
     await clientStore.index(params.value);
     clients.value = clientStore.getClients; 
     clientsData.value = clients.value.data;
+    prepareDataToTable();
 };
+
+
+const prepareDataToTable = () => {
+    clientsData.value = clients.value.data.map((client) => {
+        return {
+            id: client.id,
+            slug: client.slug,
+            Nome: client.name,
+            Email: client.email,
+            Telefone: client.phone,
+            Endereço: client.address,
+            Tipo: client.type,
+            'Última Compra': client.last_purchase,
+        }
+    })
+}
+
+const getItemById = (id: number) => clients.value.data.find((item) => item.id === id);
 
 const handlePageChange = async (pageUrl: string) => {
     if (pageUrl) {
@@ -120,7 +139,9 @@ const actions: Action[] = [
         name: 'edit',
         hasPermission: hasPermissionTo('Update client'),
         action: (item) => {
-            form.value = formData(item);
+            currentItem.value = getItemById(item.id);
+
+            form.value = formData(currentItem.value);
             showModal.value = true;
         },
         icon: 'edit',

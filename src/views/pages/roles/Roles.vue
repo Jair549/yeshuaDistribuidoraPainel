@@ -64,6 +64,7 @@ const roles = ref<Pagination>({
     total: 0,
 });
 const permissions = ref<Permission[]>([]);
+const rolesData = ref([]);
 
 onMounted(async () => {
     isLoading.value = true;
@@ -75,7 +76,21 @@ onMounted(async () => {
 const loadRoles = async () => {
     await roleStore.index(params.value);
     roles.value = roleStore.getRoles
+    console.log('roles', roles.value.data)
+    prepareDataToTable();
 };
+
+const prepareDataToTable = () => {
+    rolesData.value = roles.value.data.map((role) => {
+        return {
+            id: role.id,
+            slug: role.slug,
+            Nome: role.name,
+        }
+    })
+}
+
+const getItemById = (id: number) => roles.value.data.find((item) => item.id === id);
 
 const handlePageChange = async (pageUrl: string) => {
     if (pageUrl) {
@@ -121,8 +136,10 @@ const actions: Action[] = [
         name: 'edit',
         hasPermission: hasPermissionTo('Update role'),
         action: (item) => {
-            form.value = formData(item);
-            form.value.permissions = item.permissions.map((permission) => permission.id);
+            currentItem.value = getItemById(item.id);
+            
+            form.value = formData(currentItem.value);
+            form.value.permissions = currentItem.value.permissions.map((permission) => permission.id);
             showModal.value = true;
         },
         icon: 'edit',
@@ -164,6 +181,7 @@ const handleModalTitle = () => {
 
 const handleCloseModal = () => {
   showModal.value = false;
+  clearForm();
 };
 
 const handleSubmit = async() => {
@@ -212,12 +230,12 @@ const clearForm = () => {
                 <ButtonComponent buttonClass="btn-secondary" text="Adicionar" icon="plus" light @click="showModal = true" v-if="hasPermissionTo('Create role')" />
             </template>        
             <TableComponent 
-                :items="roles.data" 
+                :items="rolesData" 
                 :actions="actions"
             />
         
             <PaginationComponent
-                :items="roles.data" 
+                :items="rolesData" 
                 :pagination="roles" 
                 @page-change="handlePageChange"
                 @per-page-change="handlePerPageChange"

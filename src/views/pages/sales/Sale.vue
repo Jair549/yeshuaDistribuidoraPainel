@@ -22,6 +22,7 @@ import {
     ConfirmDeleteModalComponent,
     PaginationComponent
 } from '@/utils/components';
+import Products from '../products/Products.vue';
 
 const saleStore = useSaleStore();
 const productsStore = useProductStore();
@@ -109,21 +110,40 @@ const params = ref<RequestParams>({
     page: 1,
 });
 
-const salesData = ref<Sale[]>([]);
+const salesData = ref([]);
 
 onMounted(async () => {
     isLoading.value = true
     await loadSale();
+    isLoading.value = false
     await loadProduct();
     await loadClient();
-    isLoading.value = false
 })
 
 const loadSale = async () => {
     await saleStore.index(params.value);
     sales.value = saleStore.getSales;
     salesData.value = sales.value.data;
+    prepareDataToTable();
 }
+
+const prepareDataToTable = () => {
+    salesData.value = sales.value.data.map((sale) => {
+        return {
+            id: sale.id,
+            Cliente: sale.client.name,
+            Produto: sale.product.name,
+            Quantidade: sale.quantity,
+            'Preço Único': sale.unit_price,
+            'Preço Total': sale.total_price,
+            'Metodo de Pagamento': sale.payment_method,
+            Status: sale.status == 'pending' ? 'Pendente' : 'Pago',
+            'Data de Pagamento': sale.payment_date,
+        }
+    })
+}
+
+const getItemById = (id: number) => sales.value.data.find((item) => item.id === id);
 
 const loadClient = async () => {
     await clientStore.index({ without_pagination: 1 });
@@ -135,7 +155,6 @@ const loadClient = async () => {
 const loadProduct = async () => {
     await productsStore.index({ without_pagination: 1 })
     products.value = productsStore.getProducts;
-
     selectProduct.value = products.value.map(product => ({ value: product.id, text: product.name }))
 }
 
@@ -162,7 +181,11 @@ const actions: Action[] = [
         name: 'edit',
         hasPermission: hasPermissionTo('Update sale'),
         action: (item) => {
-            form.value = formData(item);
+            currentItem.value = getItemById(item.id)
+            console.log('Current Item', currentItem.value.product)
+            form.value = formData(currentItem.value);
+            form.value.product_id = currentItem.value.product.id;
+            form.value.client_id = currentItem.value.client.id;
             showModal.value = true;
         },
         icon: 'edit',
