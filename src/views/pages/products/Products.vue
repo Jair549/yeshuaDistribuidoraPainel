@@ -49,6 +49,7 @@ const formData = (data: any = {}) => {
 const handleCloseModal = () => {
     showModal.value = false;
     showStockModal.value = false;
+    clearForm();
 };
 
 const handleModalTitle = () => {
@@ -104,7 +105,7 @@ const prepareDataToTable = () => {
             Nome: product.name,
             Marca: product.brand.name,
             'Em Estoque': product.stocks[0].quantity,
-            'Preço Único': product.unit_price,
+            'Preço Único': `R$ ${product.unit_price}`,
             Descrição: product.description,
         }
     })
@@ -239,22 +240,29 @@ const clearForm = () => {
         @confirmDelete="confirmDelete"
     />
     
-    <ModalComponent :show="showModal" :titleHeader="handleModalTitle()" @closeModal="handleCloseModal" @submit="handleSubmit()">
+    <ModalComponent class="modalWidth" :show="showModal" :titleHeader="handleModalTitle()" @closeModal="handleCloseModal" @submit="handleSubmit()">
         <FormGroupComponent>
-            <InputComponent v-model="form.name" placeholder="Nome" type="text" />
+            <div class="row">
+                <div class="col-md-6">
+                    <InputComponent v-model="form.name" placeholder="Nome" type="text" />
+                </div>
+                <div class="col-md-6">
+                    <SelectComponent :options="selectBrand" v-model="form.brand_id"  placeholder="Marca" />
+                </div>
+            </div>
         </FormGroupComponent>
         <FormGroupComponent>
-            <!-- <InputComponent v-model="form.brand_id" placeholder="Marca" type="text" /> -->
-             <SelectComponent :options="selectBrand" v-model="form.brand_id"  placeholder="Marca" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <InputComponent v-model="form.unit_price" placeholder="Preço unitário" type="text" />
+            <div class="row">
+                <div class="col-md-6">
+                    <InputComponent v-model="form.unit_price" placeholder="Preço unitário" type="text" />
+                </div>
+                <div class="col-md-6">
+                    <InputComponent v-model="form.quantity" placeholder="Quantidade" type="text" />
+                </div>
+            </div>
         </FormGroupComponent>
         <FormGroupComponent>
             <InputComponent v-model="form.description" placeholder="Descrição" type="text" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <InputComponent v-model="form.quantity" placeholder="Quantidade" type="text" />
         </FormGroupComponent>
     </ModalComponent>
     

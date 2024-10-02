@@ -139,8 +139,8 @@ const prepareDataToTable = () => {
             Produto: purchase.product.name,
             Marca: purchase.supplier.name,
             Quantidade: purchase.quantity,
-            'Preço Único': purchase.unit_price,
-            'Preço Total': purchase.total_price,
+            'Preço Único': `R$ ${purchase.unit_price}`,
+            'Preço Total': `R$ ${purchase.total_price}`,
             'Data de Vencimento': purchase.due_date,
             'Data de Pagamento': purchase.payment_date,
             'Metodo de Pagamento': paymentTranslateMethod[purchase.payment_method],
@@ -260,33 +260,49 @@ const clearForm = () => {
         @confirmDelete="confirmDelete"
     />
 
-    <ModalComponent :show="showModal" :titleHeader="handleModalTitle()" @closeModal="handleCloseModal" @submit="handleSubmit()">
+    <ModalComponent class="modalWidth" :show="showModal" :titleHeader="handleModalTitle()" @closeModal="handleCloseModal" @submit="handleSubmit()">
         <FormGroupComponent>
-             <SelectComponent :options="selectSuppliers" v-model="form.supplier_id" placeholder="Fornecedor" />
+            <div class="row">
+                <div class="col-md-6">
+                    <SelectComponent :options="selectSuppliers" v-model="form.supplier_id" placeholder="Fornecedor" />
+                </div>
+                <div class="col-md-6">
+                    <SelectComponent :options="selectProduct" v-model="form.product_id" placeholder="Produtos" />
+                </div>
+            </div>
         </FormGroupComponent>
         <FormGroupComponent>
-            <SelectComponent :options="selectProduct" v-model="form.product_id" placeholder="Produtos" />
+            <div class="row">
+                <div class="col-md-6">
+                    <InputComponent v-model="form.quantity" placeholder="Quantidade" type="text" />
+                </div>
+                <div class="col-md-6">
+                    <InputComponent v-model="form.unit_price" placeholder="Preço único" type="text" />
+                </div>
+            </div>
         </FormGroupComponent>
         <FormGroupComponent>
-            <InputComponent v-model="form.quantity" placeholder="Quantidade" type="text" />
+            <div class="row">
+                <div class="col-md-6">
+                    <InputComponent v-model="form.payment_date" placeholder="Data de pagamento" type="date" />
+                </div>
+                <div class="col-md-6">
+                    <InputComponent v-model="form.due_date" placeholder="Data de vencimento" type="date" />
+                </div>
+            </div>
         </FormGroupComponent>
         <FormGroupComponent>
-            <InputComponent v-model="form.unit_price" placeholder="Preço único" type="text" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <InputComponent v-model="form.total_price" placeholder="Preço total" type="text" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <InputComponent v-model="form.due_date" placeholder="Data de vencimento" type="date" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <SelectComponent :options="paymentMethod" v-model="form.payment_method" placeholder="Metodo de pagamento" />
+            <div class="row">
+                <div class="col-md-6">
+                    <SelectComponent :options="paymentMethod" v-model="form.payment_method" placeholder="Metodo de pagamento" />
+                </div>
+                <div class="col-md-6">
+                    <InputComponent v-model="form.total_price" placeholder="Preço total" type="text" />
+                </div>
+            </div>
         </FormGroupComponent>
         <FormGroupComponent>
             <SelectComponent :options="status" v-model="form.status" placeholder="Status" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <InputComponent v-model="form.payment_date" placeholder="Data de pagamento" type="date" />
         </FormGroupComponent>
     </ModalComponent>
 

@@ -140,8 +140,8 @@ const prepareDataToTable = () => {
             Cliente: sale.client.name,
             Produto: sale.product.name,
             Quantidade: sale.quantity,
-            'Preço Único': sale.unit_price,
-            'Preço Total': sale.total_price,
+            'Preço Único': `R$ ${sale.unit_price}`,
+            'Preço Total': `R$ ${sale.total_price}`,
             'Metodo de Pagamento': paymentTranslateMethod[sale.payment_method],
             Status: sale.status == 'pending' ? 'Pendente' : 'Pago',
             'Data de Pagamento': sale.payment_date,
@@ -272,10 +272,14 @@ const clearForm = () => {
             <InputComponent v-model="form.quantity" placeholder="Quantidade" type="text" />
         </FormGroupComponent>
         <FormGroupComponent>
-            <InputComponent v-model="form.unit_price" placeholder="Preço único" type="text" />
-        </FormGroupComponent>
-        <FormGroupComponent>
-            <InputComponent v-model="form.total_price" placeholder="Preço total" type="text" />
+            <div class="row">
+                <div class="col-md-6">
+                    <InputComponent v-model="form.unit_price" placeholder="Preço único" type="text" />
+                </div>
+                <div class="col-md-6">
+                    <InputComponent v-model="form.total_price" placeholder="Preço total" type="text" />
+                </div>
+            </div>
         </FormGroupComponent>
         <FormGroupComponent>
             <SelectComponent :options="paymentMethod" v-model="form.payment_method" placeholder="Metodo de pagamento" />
@@ -284,7 +288,11 @@ const clearForm = () => {
             <SelectComponent :options="status" v-model="form.status" placeholder="Status" />
         </FormGroupComponent>
         <FormGroupComponent>
-            <InputComponent v-model="form.payment_date" placeholder="Data de pagamento" type="date" />
+            <div class="row">
+                <div class="col-md-6">
+                    <InputComponent v-model="form.payment_date" placeholder="Data de pagamento" type="date" />
+                </div>
+            </div>
         </FormGroupComponent>
     </ModalComponent>
 

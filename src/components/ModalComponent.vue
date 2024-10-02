@@ -127,7 +127,7 @@ const handleCustomAction = () => {
     position: relative;
 
     .modal-dialog{
-        max-width: 1200px!important;
+        max-width: 1200px;
     }
     .modal-content{
         border: none!important;

@@ -82,14 +82,33 @@ const loadSuppliers = async () => {
     suppliers.value = supplierStore.getSuppliers;
     suppliersData.value = suppliers.value.data;
     isLoading.value = false
+    prepareDataToTable();
+};
+
+const prepareDataToTable = () => {
+    suppliersData.value = suppliers.value.data.map((supplier) => {
+        return {
+            id: supplier.id,
+            slug: supplier.slug,
+            Nome: supplier.name,
+            Email: supplier.email,
+            Endereço: supplier.address,
+            Telefone: supplier.phone,
+            Desrição: supplier.description,
+            'Última Compra': supplier.last_purchase,
+        }
+    })
 }
+
+const getItemById = (id: number) => suppliers.value.data.find((item) => item.id === id);
 
 const actions: Action[] = [
     {
         name: 'edit',
         hasPermission: hasPermissionTo('Update supplier'),
         action: (item) => {
-            form.value = formData(item);
+            currentItem.value = getItemById(item.id)
+            form.value = currentItem.value;
             showModal.value = true;
         },
         icon: 'edit',
@@ -171,7 +190,7 @@ const clearForm = () => {
 <template>
     <LoadingComponent :show="isLoading" />
 
-    <ModalComponent :show="showModal" :titleHeader="handleModalTitle()" @closeModal="handleCloseModal" @submit="handleSubmit()">
+    <ModalComponent class="modalWidth" :show="showModal" :titleHeader="handleModalTitle()" @closeModal="handleCloseModal" @submit="handleSubmit()">
         <FormGroupComponent>
             <div class="row">
                 <div class="col-md-6">
