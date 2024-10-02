@@ -83,6 +83,12 @@ const paymentMethod = [
     }
 ]
 
+const paymentTranslateMethod = {
+    pix: 'Pix',
+    card: 'Cartão',
+    money: 'Dinheiro'
+}
+
 const handleModalTitle = () => {
     return form.value.id ? 'Editar Compra' : 'Adicionar Compra';
 }
@@ -136,7 +142,7 @@ const prepareDataToTable = () => {
             Quantidade: sale.quantity,
             'Preço Único': sale.unit_price,
             'Preço Total': sale.total_price,
-            'Metodo de Pagamento': sale.payment_method,
+            'Metodo de Pagamento': paymentTranslateMethod[sale.payment_method],
             Status: sale.status == 'pending' ? 'Pendente' : 'Pago',
             'Data de Pagamento': sale.payment_date,
         }

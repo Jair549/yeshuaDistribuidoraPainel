@@ -74,15 +74,28 @@ const otherExpensesData = ref<OtherExpense[]>([]);
 
 onMounted(async () => {
     isLoading.value = true
-    await loadSale();
+    await loadOtherExpense();
     isLoading.value = false
 })
 
-const loadSale = async () => {
+const loadOtherExpense = async () => {
     await otherExpenseStore.index(params.value);
     otherExpenses.value = otherExpenseStore.getOtherExpenses;
     otherExpensesData.value = otherExpenses.value.data;
+    prepareDataToTable();
 }
+
+const prepareDataToTable = () => {
+    otherExpensesData.value = otherExpenses.value.data.map((otherExpense) => {
+        return {
+            id: otherExpense.id,
+            Preço: `R$ ${otherExpense.price}`,
+            Descrição: otherExpense.description,
+        }
+    })
+}
+
+const getItemById = (id: number) => otherExpenses.value.data.find((item) => item.id === id);
 
 const closeDeleteModal = () => {
     showDeleteModal.value = false;
@@ -98,7 +111,7 @@ const confirmDelete = () => {
 const handleDelete = async () => {
     isLoading.value = true;
     await otherExpenseStore.destroy(currentItem.value)
-    await loadSale();
+    await loadOtherExpense();
     isLoading.value = false;
 }
 
@@ -107,7 +120,9 @@ const actions: Action[] = [
         name: 'edit',
         hasPermission: hasPermissionTo('Update other expense'),
         action: (item) => {
-            form.value = formData(item);
+            currentItem.value = getItemById(item.id);
+
+            form.value = currentItem.value;
             showModal.value = true;
         },
         icon: 'edit',
@@ -127,7 +142,7 @@ const actions: Action[] = [
 
 const handleSearch = (searchTerm: string) => {
     params.value.search = searchTerm;
-    loadSale();
+    loadOtherExpense();
 };
 
 const handlePageChange = async (pageUrl: string) => {
@@ -139,7 +154,7 @@ const handlePageChange = async (pageUrl: string) => {
 
         params.value.page = page;
 
-        await loadSale();
+        await loadOtherExpense();
         isLoading.value = false;
 
     }
@@ -148,7 +163,7 @@ const handlePageChange = async (pageUrl: string) => {
 const handlePerPageChange = (newPerPage) => {
     params.value.per_page = newPerPage;
     params.value.page = 1;
-    loadSale();
+    loadOtherExpense();
 };
 
 const handleSubmit = async() => {
@@ -158,7 +173,7 @@ const handleSubmit = async() => {
     }else{
         await otherExpenseStore.store(form.value);
     }
-    await loadSale();
+    await loadOtherExpense();
     isLoading.value = false;
     clearForm();
 }
