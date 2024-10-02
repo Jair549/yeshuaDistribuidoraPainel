@@ -25,6 +25,7 @@ import { ButtonComponent,
 const productStore = useProductStore();
 const stockStore = useStockStore();
 const brandStore = useBrandStore();
+const stocks = ref({});
 const brand = ref({});
 const showModal = ref(false);
 const showDeleteModal = ref(false);
@@ -41,7 +42,7 @@ const formData = (data: any = {}) => {
         brand_id: data.brand_id || '',
         unit_price: data.unit_price || '',
         description: data.description || '',
-        quantity: '',
+        quantity: data.quantity || '',
     }
 }
 
@@ -79,10 +80,12 @@ const params = ref<RequestParams>({
     page: 1,
 });
 
-const productsData = ref<Product[]>([]);
+const productsData = ref([]);
 
 onMounted(async () => {
+    isLoading.value = true;
     await loadProducts();
+    isLoading.value = false;
     await loadBrands();
 })
 
@@ -90,7 +93,24 @@ const loadProducts = async () => {
     await productStore.index(params.value);
     products.value = productStore.getProducts;
     productsData.value = products.value.data;
+    prepareDataToTable();
 }
+
+const prepareDataToTable = () => {
+    productsData.value = products.value.data.map((product) => {
+        return {
+            id: product.id,
+            slug: product.slug,
+            Nome: product.name,
+            Marca: product.brand.name,
+            'Em Estoque': product.stocks[0].quantity,
+            'Preço Único': product.unit_price,
+            Descrição: product.description,
+        }
+    })
+}
+
+const getItemById = (id: number) => products.value.data.find((item) => item.id === id);
 
 const loadBrands = async () => {
     await brandStore.index({without_pagination: 1})
@@ -122,7 +142,9 @@ const actions: Action[] = [
         name: 'edit',
         hasPermission: hasPermissionTo('Update product'),
         action: (item) => {
-            form.value = formData(item);
+            currentItem.value = getItemById(item.id);
+            form.value = currentItem.value;
+            form.value.quantity = currentItem.value.stocks[0].quantity;
             showModal.value = true;
         },
         icon: 'edit',
@@ -142,7 +164,7 @@ const actions: Action[] = [
         name: 'stock',
         hasPermission: hasPermissionTo('Update product'),
         action: (item) => {
-            currentItem.value = item;
+            currentItem.value = getItemById(item.id);
             formStock.value.quantity = currentItem.value.stocks.length > 0 ? currentItem.value.stocks[0].quantity : 0;
             showStockModal.value = true;
         },
