@@ -76,7 +76,6 @@ onMounted(async () => {
 const loadRoles = async () => {
     await roleStore.index(params.value);
     roles.value = roleStore.getRoles
-    console.log('roles', roles.value.data)
     prepareDataToTable();
 };
 

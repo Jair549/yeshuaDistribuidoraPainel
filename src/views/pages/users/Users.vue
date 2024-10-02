@@ -30,6 +30,7 @@ const showDeleteModal = ref(false);
 const userStore = useUserStore();
 const roleStore = useRoleStore();
 const currentItem = ref(null);
+const userData = ref([]);
 
 const { hasPermissionTo } = useAcl();
 
@@ -68,10 +69,32 @@ const users = ref<Pagination>({
 
 const roles = ref<Role[]>([]);
 
+onMounted(async () => {
+    isLoading.value = true;
+    await loadUsers();
+    isLoading.value = false;
+    await loadRoles();
+});
+
 const loadUsers = async () => {
     await userStore.index(params.value);
     users.value = userStore.getUsers;
+    prepareDataToTable();
+
 }
+
+const prepareDataToTable = () => {
+    userData.value = users.value.data.map((user) => {
+        return {
+            id: user.id,
+            slug: user.slug,
+            Nome: user.name,
+            Email: user.email,
+        }
+    })
+}
+
+const getItemById = (id: number) => users.value.data.find((item) => item.id === id);
 
 const handlePageChange = async (pageUrl: string) => {
     if (pageUrl) {
@@ -95,6 +118,7 @@ const handlePerPageChange = (newPerPage) => {
 };
 
 const rolesSelectData = ref([]);
+
 const loadRoles = async () => {
     await roleStore.index({ without_pagination: 1 });
     roles.value = roleStore.getRoles;
@@ -112,21 +136,14 @@ const handleSearch = (searchTerm: string) => {
     loadUsers();
 };
 
-onMounted(async () => {
-    isLoading.value = true;
-    await loadUsers();
-    await loadRoles();
-    
-    isLoading.value = false;
-});
-
 const actions: Action[] = [
     {
         name: 'edit',
         hasPermission: hasPermissionTo('Update user'),
         action: (item) => {
-            form.value = formData(item);
-            form.value.roles = item.roles.map((role) => role.id);
+            currentItem.value = getItemById(item.id)
+            form.value = currentItem.value;
+            form.value.roles = currentItem.value.roles.map((role) => role.id);
             showModal.value = true;
         },
         icon: 'edit',
@@ -222,12 +239,12 @@ const clearForm = () => {
                 <ButtonComponent buttonClass="btn-secondary" text="Adicionar" icon="plus" light @click="showModal = true" v-if="hasPermissionTo('Create user')" />
             </template>        
             <TableComponent 
-                :items="users.data" 
+                :items="userData" 
                 :actions="actions"
             />
         
             <PaginationComponent
-                :items="users.data" 
+                :items="userData" 
                 :pagination="users" 
                 @page-change="handlePageChange"
                 @per-page-change="handlePerPageChange"
