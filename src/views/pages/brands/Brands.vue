@@ -69,7 +69,7 @@ const params = ref<RequestParams>({
     page: 1,
 });
 
-const brandsData = ref<Brand[]>([]);
+const brandsData = ref([]);
 
 onMounted(async () => {
     await loadBrand();
@@ -80,8 +80,22 @@ const loadBrand = async () => {
     await brandStore.index(params.value);
     brands.value = brandStore.getBrands;
     brandsData.value = brands.value.data;
-    isLoading.value = false
+    isLoading.value = false;
+    prepareDataToTable();
 }
+
+const prepareDataToTable = () => {
+    brandsData.value = brands.value.data.map((brand) => {
+        return {
+            id: brand.id,
+            slug: brand.slug,
+            Nome: brand.name,
+            Descição: brand.description,
+        }
+    })
+}
+
+const getItemById = (id: number) => brands.value.data.find((item) => item.id === id);
 
 const closeDeleteModal = () => {
     showDeleteModal.value = false;
@@ -106,7 +120,9 @@ const actions: Action[] = [
         name: 'edit',
         hasPermission: hasPermissionTo('Update brand'),
         action: (item) => {
-            form.value = formData(item);
+            currentItem.value = getItemById(item.id);
+
+            form.value = currentItem.value;
             showModal.value = true;
         },
         icon: 'edit',
